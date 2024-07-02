@@ -1,4 +1,6 @@
-FROM ubuntu:18.04
+FROM zhongruoyu/llvm-ports:16.0.6-slim-bookworm
+
+WORKDIR /workspace
 
 RUN echo "Updating Ubuntu"
 RUN apt-get update && apt-get upgrade -y
@@ -6,10 +8,6 @@ RUN apt-get update && apt-get upgrade -y
 RUN echo "Installing dependencies..."
 RUN apt install -y \
 			ccache \
-			clang \
-			clang-format \
-			clang-tidy \
-			cppcheck \
 			curl \
 			doxygen \
 			gcc \
@@ -33,20 +31,10 @@ RUN apt install -y wget tar build-essential libssl-dev && \
 			make && \
 			make install 
 
-RUN pip3 install conan
-
-RUN git clone https://github.com/catchorg/Catch2.git && \
-		 cd Catch2 && \
-		 cmake -Bbuild -H. -DBUILD_TESTING=OFF && \
-		 cmake --build build/ --target install
-
 # Disabled pthread support for GTest due to linking errors
-RUN git clone https://github.com/google/googletest.git --branch release-1.10.0 && \
+RUN git clone https://github.com/google/googletest.git --branch release-1.12.0 && \
         cd googletest && \
         cmake -Bbuild -Dgtest_disable_pthreads=1 && \
         cmake --build build --config Release && \
         cmake --build build --target install --config Release
 
-RUN git clone https://github.com/microsoft/vcpkg -b 2020.06 && \
-		cd vcpkg && \
-		./bootstrap-vcpkg.sh -disableMetrics -useSystemBinaries	
